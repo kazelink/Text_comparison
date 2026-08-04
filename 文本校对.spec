@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['C:\\Users\\GX\\Text_comparison\\src\\main.py'],
-    pathex=[],
+    pathex=['src'],
     binaries=[],
     datas=[('C:\\Users\\GX\\Text_comparison\\assets\\文档对比.ico', '.')],
     hiddenimports=[],
