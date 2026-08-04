@@ -1,5 +1,18 @@
-/.idea
-/.venv
-/build
-/dist
-/pyinstaller.txt
+# 虚拟环境
+/.venv/
+
+# Python 字节码缓存
+__pycache__/
+*.py[cod]
+
+# 备份文件
+*.bak
+
+# PyInstaller 构建产物
+/build/
+/dist/
+/src/build/
+/src/dist/
+
+# IDE 本地配置
+/.idea/
