@@ -1,5 +1,3 @@
-"""Fluent 圆角按钮。"""
-
 import tkinter as tk
 from tkinter import font as tkfont
 
@@ -7,45 +5,36 @@ from drawing import draw_round_rect
 from theme import (ACCENT, ACCENT_DIS, ACCENT_HOVER, ACCENT_PRESS,
                    BG, BTN_BG, BTN_BORDER, BTN_DIS_BG, BTN_DIS_BD,
                    BTN_H, BTN_HOVER, BTN_PRESS, BTN_RADIUS, F,
-                   SUBTLE_HOVER, SUBTLE_PRESS,
-                   TEXT_DIS, TEXT_PRI, TEXT_SEC)
+                   SUBTLE_HOVER, SUBTLE_PRESS, TEXT_DIS, TEXT_PRI, TEXT_SEC)
 
 
 class FluentButton(tk.Canvas):
-    """Fluent 圆角按钮。variant: accent / standard / subtle。
-
-    保留了 ttk.Button 的全部对外行为：.config(state=…)、Tab 聚焦、
-    空格/回车触发。不画焦点框，点击后不会出现黑圈 —— 与 Win11
-    经典按钮行为一致。
-    """
-
     def __init__(self, master, text="", command=None, variant="standard",
                  height=BTN_H, min_width=0, bg=BG):
-        self._text    = text
+        self._text = text
         self._command = command
         self._variant = variant
-        self._font    = F["ui"]
-        self._state   = tk.NORMAL
-        self._hover   = False
-        self._press   = False
+        self._font = F["ui"]
+        self._state = tk.NORMAL
+        self._hover = self._press = False
 
         pad = 14 if variant != "subtle" else 10
-        w = max(min_width,
-                tkfont.Font(root=master, font=self._font).measure(text) + 2 * pad)
-        super().__init__(master, width=w, height=height,
+        width = max(min_width,
+                    tkfont.Font(root=master, font=self._font).measure(text) + 2 * pad)
+        super().__init__(master, width=width, height=height,
                          highlightthickness=0, bd=0, bg=bg, takefocus=1)
 
-        self.bind("<Configure>",       lambda e: self._redraw())
-        self.bind("<Enter>",           lambda e: self._set(hover=True))
-        self.bind("<Leave>",           lambda e: self._set(hover=False, press=False))
-        self.bind("<ButtonPress-1>",   self._on_press)
+        self.bind("<Configure>", lambda e: self._redraw())
+        self.bind("<Enter>", lambda e: self._set(hover=True))
+        self.bind("<Leave>", lambda e: self._set(hover=False, press=False))
+        self.bind("<ButtonPress-1>", self._on_press)
         self.bind("<ButtonRelease-1>", self._on_release)
-        self.bind("<space>",           lambda e: self._invoke())
-        self.bind("<Return>",          lambda e: self._invoke())
+        self.bind("<space>", lambda e: self._invoke())
+        self.bind("<Return>", lambda e: self._invoke())
 
     def _set(self, **kw):
-        for k, v in kw.items():
-            setattr(self, "_" + k, v)
+        for key, value in kw.items():
+            setattr(self, "_" + key, value)
         self._redraw()
 
     def _on_press(self, _e):
@@ -67,19 +56,18 @@ class FluentButton(tk.Canvas):
         return "break"
 
     def configure(self, cnf=None, **kw):
-        state = kw.pop("state", None)
-        if state is not None:
-            self._state = str(state)
+        opts = dict(cnf or {})
+        opts.update(kw)
+        if "state" in opts:
+            self._state = str(opts.pop("state"))
             if self._state == tk.DISABLED:
                 self._hover = self._press = False
             self._redraw()
-        if cnf or kw:
-            return super().configure(cnf, **kw)
+        return super().configure(opts) if opts else None
 
     config = configure
 
     def _colors(self):
-        """→ (填充, 描边, 描边宽, 文字)"""
         if self._state == tk.DISABLED:
             if self._variant == "accent":
                 return ACCENT_DIS, None, 0, "#FFFFFF"
